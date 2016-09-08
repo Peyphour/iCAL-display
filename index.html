@@ -30,12 +30,9 @@
       </div>
       <div id="navbar" class="collapse navbar-collapse">
         <ul class="nav navbar-nav">
-          <li class="active"><a id="day" href="#" 
-onClick="icalBeginDay()">Jour</a></li>
-          <li><a id="week" href="#" 
-onClick="icalBeginWeek()">Semaine</a></li>
-          <li><a href="#" id="month" 
-onClick="icalBeginMonth()">Mois</a></li>
+          <li id="day" class="active"><a href="#" onClick="icalBeginDay()">Jour</a></li>
+          <li id="week"><a href="#" onClick="icalBeginWeek()">Semaine</a></li>
+          <li id="month"><a href="#" onClick="icalBeginMonth()">Mois</a></li>
         </ul>
       </div><!--/.nav-collapse -->
     </div>
@@ -54,7 +51,7 @@ onClick="icalBeginMonth()">Mois</a></li>
     <script>
         var data;
         $.ajax({
-            url: '........',
+            url: '[[ICS_URL]]',
             success: function(result) {
                 data = result;
                 icalBeginDay();
