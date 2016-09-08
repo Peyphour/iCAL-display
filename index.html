@@ -1,0 +1,151 @@
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="./ical.min.js"></script>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
+    <style>
+        body {
+            padding-top: 50px;
+        }
+        #calendar {
+          padding-top: 25px;
+        }
+    </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-inverse navbar-fixed-top">
+    <div class="container">
+      <div class="navbar-header">
+        <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+          <span class="sr-only">Toggle navigation</span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+          <span class="icon-bar"></span>
+        </button>
+        <a class="navbar-brand" href="#">Emploi du temps</a>
+      </div>
+      <div id="navbar" class="collapse navbar-collapse">
+        <ul class="nav navbar-nav">
+          <li class="active"><a id="day" href="#" 
+onClick="icalBeginDay()">Jour</a></li>
+          <li><a id="week" href="#" 
+onClick="icalBeginWeek()">Semaine</a></li>
+          <li><a href="#" id="month" 
+onClick="icalBeginMonth()">Mois</a></li>
+        </ul>
+      </div><!--/.nav-collapse -->
+    </div>
+  </nav>
+
+    <div class="container">
+
+        <div id="calendar" class="row">
+
+        </div>
+
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
+    <script>
+        var data;
+        $.ajax({
+            url: '........',
+            success: function(result) {
+                data = result;
+                icalBeginDay();
+            }
+        });
+
+        function clear() {
+          $("#calendar").html("");
+	  $(".active").removeClass("active");
+        }
+
+        function sort(array) {
+          return array.sort(function(a, b) {
+            var i = new ICAL.Event(a);
+            var j = new ICAL.Event(b);
+            return i.startDate.compare(j.startDate);
+          });
+        }
+
+        function createPanel(event) {
+          var months = [
+            "Janvier", "Février", "Mars", "Avril", "Mai", "Juin", "Juillet", "Août", "Septembre", "Octobre", "Novembre", "Décembre"
+          ];
+
+          var panel = "<div class='panel panel-default'>";
+          panel += "<div class='panel-heading'>";
+          panel += (event.startDate.day + " " + months[event.startDate.month - 1] + " " + event.startDate.year + " à " + event.startDate.hour + "h" + event.startDate.minute + "0");
+          panel += "</div><div class='panel-body'>";
+          panel += event.summary;
+          panel += "</div></div>";
+
+          return panel;
+        }
+
+        function icalBeginDay() {
+            clear();
+            $("#day").addClass("active");
+            var jCal = ICAL.parse(data);
+            var comps = new ICAL.Component(jCal).getAllSubcomponents("vevent");
+            comps = sort(comps);
+            comps.forEach(function(element, index, array) {
+                var event = new ICAL.Event(element);
+                var timezone = 2;
+                event.startDate.adjust(0, timezone, 0, 0, 0);
+                event.endDate.adjust(0, timezone, 0, 0, 0);
+
+                if(event.startDate.day == ICAL.Time.now().day && event.startDate.month == ICAL.Time.now().month) {
+                  $("#calendar").append(createPanel(event));
+                }
+            });
+        }
+
+        function icalBeginWeek() {
+            clear();
+	    $("#week").addClass("active");
+            var jCal = ICAL.parse(data);
+            var comps = new ICAL.Component(jCal).getAllSubcomponents("vevent");
+            comps = sort(comps);
+            comps.forEach(function(element, index, array) {
+                var event = new ICAL.Event(element);
+                var timezone = 2;
+                event.startDate.adjust(0, timezone, 0, 0, 0);
+                event.endDate.adjust(0, timezone, 0, 0, 0);
+
+                if(Math.abs(event.startDate.day - ICAL.Time.now().day) <= 7 &&
+                    event.startDate.month == ICAL.Time.now().month &&
+                    event.startDate.day >=  ICAL.Time.now().day) {
+                  $("#calendar").append(createPanel(event));
+                }
+            });
+        }
+
+        function icalBeginMonth() {
+            clear();
+	    $("#month").addClass("active");
+            var jCal = ICAL.parse(data);
+            var comps = new ICAL.Component(jCal).getAllSubcomponents("vevent");
+            comps = sort(comps);
+            comps.forEach(function(element, index, array) {
+                var event = new ICAL.Event(element);
+                var timezone = 2;
+                event.startDate.adjust(0, timezone, 0, 0, 0);
+                event.endDate.adjust(0, timezone, 0, 0, 0);
+
+                if(event.startDate.month == ICAL.Time.now().month &&
+                    event.startDate.day >=  ICAL.Time.now().day) {
+                  $("#calendar").append(createPanel(event));
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
